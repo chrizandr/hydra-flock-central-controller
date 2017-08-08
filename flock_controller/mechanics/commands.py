@@ -1,9 +1,23 @@
 """Operations for managing commands."""
 from hydra import Resource, SCHEMA
-from flock_controller.mechanics.main import DRONE1, CENTRAL_SERVER
-from flock_controller.mechanics.main import RES_DRONE1, RES_CS
-from flock_controller.mechanics.main import gen_Command, gen_State
+from flock_controller.mechanics.main import CENTRAL_SERVER, RES_CS
 import json
+
+
+def gen_Command(state):
+    """Generate a Command object."""
+    command = {
+        "@type": "Command",
+        "State": state
+    }
+    return command
+
+
+def confirm_anomaly(drone):
+    """Issue command to drone to confirm the anomaly."""
+    drone["DroneState"]["Status"] = "Confirming"
+    command = gen_Command(drone["DroneState"])
+    return command
 
 
 def get_command_collection():
@@ -37,13 +51,3 @@ def issue_command(RES, Namespace_, command):
     new_command = Resource.from_iri(resp['location'])
     print("Command issued successfully.")
     return new_command
-
-
-if __name__ == "__main__":
-    print(get_command_collection())
-
-    state = gen_State(-1000, "50", "North", "1,1", "Active", 100)
-    command = gen_Command(state)
-    print(create_command(command))
-
-    print(issue_command(RES_DRONE1, DRONE1, command))
